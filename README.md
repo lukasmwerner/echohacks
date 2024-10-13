@@ -36,7 +36,7 @@ popularity.
 Clone the repository:
 
 ```bash
-git clone https://github.com/yourusername/echohacks.git
+git clone https://github.com/lukasmwerner/echohacks.git
 ```
 
 Navigate to the project directory:
@@ -54,13 +54,23 @@ go mod tidy
 Ensure SQLite is installed on your machine and create the database:
 
 ```bash
-touch app.db
+sqlite3 app.db
+```
+
+```sql
+CREATE TABLE IF NOT EXISTS posts (
+    title TEXT,
+    rank INTEGER,
+    rank_delta INTEGER,
+    username TEXT,
+    PRIMARY KEY (title, username)
+);
 ```
 
 Run the application:
 
 ```bash
-go run main.go
+go run .
 ```
 
 ### Usage:
