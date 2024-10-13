@@ -3,15 +3,19 @@ package main
 import (
 	"fmt"
 
-
-"github.com/charmbracelet/lipgloss"
 	tea "github.com/charmbracelet/bubbletea"
+	"github.com/charmbracelet/lipgloss"
 )
-var(
-	positiveNumStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("00FF00"));
-	negativeNumStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("FF0000"));
-	
+
+var (
+	positiveNumStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("#00FF00"))
+	negativeNumStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("#FF0000"))
 )
+var (
+	positiveNumStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("00FF00"))
+	negativeNumStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("FF0000"))
+)
+
 // Just a generic tea.Model to demo terminal information of ssh.
 type model struct {
 	height    int
@@ -42,13 +46,12 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m model) View() string {
-	
+
 	s := ""
 	postCount := ""
-	if m.postcount > 0{
+
+	if m.postcount > 0 {
 		postCount = positiveNumStyle.Render(fmt.Sprintf("%d", m.postcount))
-
-
 	} else {
 		postCount = negativeNumStyle.Render(fmt.Sprintf("%d", m.postcount))
 	}
