@@ -15,6 +15,7 @@ var (
 	selectedItemStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("#5F5FDF")).Bold(true)
 	positiveNumStyle  = lipgloss.NewStyle().Foreground(lipgloss.Color("#00FF00"))
 	negativeNumStyle  = lipgloss.NewStyle().Foreground(lipgloss.Color("#FF0000"))
+	neutralNumStyle   = lipgloss.NewStyle().Foreground(lipgloss.Color("#FFFFFF"))
 )
 
 type Post struct {
@@ -38,31 +39,34 @@ func (d postDelegate) Render(w io.Writer, m list.Model, index int, listItem list
 	}
 
 	postCount := ""
-	if post.Rank > 0 {
-		postCount = positiveNumStyle.Render(fmt.Sprintf("%d", post.Rank))
-	} else {
-		postCount = negativeNumStyle.Render(fmt.Sprintf("%d", post.Rank))
+	if post.Rank+post.RankDelta > 0 {
+		postCount = positiveNumStyle.Render(fmt.Sprintf("%d", post.Rank+post.RankDelta))
+	} else if post.Rank+post.RankDelta < 0 {
+		postCount = negativeNumStyle.Render(fmt.Sprintf("%d", post.Rank+post.RankDelta))
+	} else{
+		postCount = neutralNumStyle.Render(fmt.Sprintf("%d", post.Rank+post.RankDelta))
 	}
-
 	fn := itemStyle.Render
 	if index == m.Index() {
 		fn = selectedItemStyle.Render
 	}
 
 	fmt.Fprintln(w, fmt.Sprintf("   ▲ %s ▼ %s \n", postCount, fn(post.Username+" - "+post.Title)))
+
 }
 
 // Just a generic tea.Model to demo terminal information of ssh.
 type model struct {
-	list       list.Model
-	input      textinput.Model
-	inputStyle lipgloss.Style
-	OnNew      func(Post)
-	OnUpdate   func(Post)
-	OnDelete   func(Post)
-	Refresh    func() []Post
-	width      int
-	height     int
+	currentUsername string
+	list            list.Model
+	input           textinput.Model
+	inputStyle      lipgloss.Style
+	OnNew           func(Post)
+	OnUpdate        func(Post)
+	OnDelete        func(Post)
+	Refresh         func() []Post
+	width           int
+	height          int
 }
 
 func (m model) Init() tea.Cmd {
@@ -79,32 +83,21 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.list.SetWidth(msg.Width)
 		m.list.SetHeight(msg.Height - 8)
 	case tea.KeyMsg:
-		index := m.list.Index()
-		if index >= 0 {
-			if item, ok := m.list.SelectedItem().(Post); ok {
-				switch msg.String() {
-				case "up": // Upvote
-					if item.RankDelta == -1 { // User previously downvoted
-						item.Rank++   // Remove the downvote
-					}
-					if item.RankDelta != 1 { // User has not upvoted yet
-						item.Rank++       // Add upvote
-						item.RankDelta = 1 // Mark as upvoted
-					}
-					m.list.SetItem(index, item) // Update the selected item
-				case "down": // Downvote
-					if item.RankDelta == 1 { // User previously upvoted
-						item.Rank--   // Remove the upvote
-					}
-					if item.RankDelta != -1 { // User has not downvoted yet
-						item.Rank--       // Add downvote
-						item.RankDelta = -1 // Mark as downvoted
-					}
-					m.list.SetItem(index, item) // Update the selected item
-				case "q", "ctrl+c":
-					return m, tea.Quit
-				}
+		switch msg.String() {
+		case "+", "=":
+			post := m.list.SelectedItem().(Post)
+			if post.RankDelta == 0 || post.RankDelta == -1 {
+				post.RankDelta += 1
 			}
+			m.list.SetItem(m.list.Index(), post)
+		case "-", "_":
+			post := m.list.SelectedItem().(Post)
+			if post.RankDelta == 1 || post.RankDelta == 0 {
+				post.RankDelta -= 1
+			}
+			m.list.SetItem(m.list.Index(), post)
+		case "q", "ctrl+c":
+			return m, tea.Quit
 		}
 	}
 
