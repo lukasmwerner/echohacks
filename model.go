@@ -11,10 +11,6 @@ var (
 	positiveNumStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("#00FF00"))
 	negativeNumStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("#FF0000"))
 )
-var (
-	positiveNumStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("00FF00"))
-	negativeNumStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("FF0000"))
-)
 
 // Just a generic tea.Model to demo terminal information of ssh.
 type model struct {
