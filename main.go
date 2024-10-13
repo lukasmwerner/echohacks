@@ -88,9 +88,13 @@ func SqliteBubbleHandler(db *sql.DB) func(s ssh.Session) (tea.Model, []tea.Progr
 			return nil, nil
 		}
 		defer rows.Close()
-
+		i := 0
 		for rows.Next() {
+			i += 1
 			var p Post
+			if i >=	20 {
+				break;
+			}
 			if err := rows.Scan(&p.Title, &p.Rank, &p.Username); err != nil {
 				return nil, nil
 			}
