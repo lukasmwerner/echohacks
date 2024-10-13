@@ -79,7 +79,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.height = msg.Height
 		m.width = msg.Width
 		m.list.SetWidth(msg.Width)
-		m.list.SetHeight(msg.Height)
+		m.list.SetHeight(msg.Height - 1)
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "+", "=":
@@ -100,5 +100,5 @@ func (m model) View() string {
 
 	list := m.list.View()
 
-	return list
+	return "echohacks\n" + list
 }
