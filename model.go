@@ -2,7 +2,11 @@ package main
 
 import (
 	"fmt"
+	"os"
 
+	"github.com/charmbracelet/bubbles/key"
+	"github.com/charmbracelet/bubbles/list"
+	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/lipgloss"
 )
@@ -15,14 +19,22 @@ var (
 type Post struct {
 	Title    string
 	Rank     int
+	RankDelta     int
 	Username string
 }
+func (p Post) FilterValue() string { return p.Title }
 
 // Just a generic tea.Model to demo terminal information of ssh.
 type model struct {
-	height int
-	width  int
-	posts  []Post
+	list       list.Model
+	input      textinput.Model
+	inputStyle lipgloss.Style
+	OnNew      func(item)
+	OnUpdate   func(item)
+	OnDelete   func(item)
+	Refresh    func() []item
+	width	  int
+	height	  int
 }
 
 func (m model) Init() tea.Cmd {
@@ -36,10 +48,19 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.width = msg.Width
 	case tea.KeyMsg:
 		switch msg.String() {
+		case "k", "up":
+			selected -= 1
+		case "j", "down":
+			selected += 1
 		case "+", "=":
-			m.postcount += 1
+			//if RankDelta = 0 {
+				//m.posts[selected] += 1
+			//}
 		case "-", "_":
-			m.postcount -= 1
+			//if RankDelta = 0 {
+				//m.posts[selected] -= 1
+			//}
+			//m.postcount -= 1
 		case "q", "ctrl+c":
 			return m, tea.Quit
 		}

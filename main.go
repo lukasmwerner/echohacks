@@ -69,11 +69,21 @@ func teaHandler(s ssh.Session) (tea.Model, []tea.ProgramOption) {
 		height:    pty.Window.Height,
 		posts: []Post{
 			{
-				Title:    "",
+				Title:    "BlasterHacks but in Go",
 				Rank:     0,
-				Username: "",
+				Username: "Tyler",
 			},
-		}
+			{
+				Title:    "Dubhacks but in Go",
+				Rank:     0,
+				Username: "Danial",
+			},
+			{
+				Title:    "HackKU but in Go",
+				Rank:     0,
+				Username: "Byron",
+			},
+		},
 	}
 	return m, []tea.ProgramOption{tea.WithAltScreen()}
 }
