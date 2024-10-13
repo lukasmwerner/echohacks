@@ -15,7 +15,7 @@ var (
 	selectedItemStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("#5F5FDF")).Bold(true)
 	positiveNumStyle  = lipgloss.NewStyle().Foreground(lipgloss.Color("#00FF00"))
 	negativeNumStyle  = lipgloss.NewStyle().Foreground(lipgloss.Color("#FF0000"))
-	neutralNumStyle   = lipgloss.NewStyle().Foreground(lipgloss.Color("#FFFFFF"))
+	neutralNumStyle   = lipgloss.NewStyle()
 )
 
 type Post struct {
