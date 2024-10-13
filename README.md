@@ -31,6 +31,10 @@ popularity.
 - SSH Handling: Charmbracelet's Wish framework for managing SSH sessions
 - Styling: Lipgloss for enhanced terminal aesthetics
 
+### Demo
+
+![](/images/demo.gif)
+
 ### Installation
 
 Clone the repository:
