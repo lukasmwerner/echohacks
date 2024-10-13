@@ -50,7 +50,7 @@ func (d postDelegate) Render(w io.Writer, m list.Model, index int, listItem list
 		fn = selectedItemStyle.Render
 	}
 
-	fmt.Fprintln(w, fmt.Sprintf("▲ %s ▼ %s \n", postCount, fn(post.Username + " - " + post.Title)))
+	fmt.Fprintln(w, fmt.Sprintf("   ▲ %s ▼ %s \n", postCount, fn(post.Username + " - " + post.Title)))
 
 }
 
