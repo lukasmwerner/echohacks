@@ -39,10 +39,10 @@ func (d postDelegate) Render(w io.Writer, m list.Model, index int, listItem list
 	}
 
 	postCount := ""
-	if post.Rank > 0 {
-		postCount = positiveNumStyle.Render(fmt.Sprintf("%d", post.Rank))
+	if post.Rank+post.RankDelta > 0 {
+		postCount = positiveNumStyle.Render(fmt.Sprintf("%d", post.Rank+post.RankDelta))
 	} else {
-		postCount = negativeNumStyle.Render(fmt.Sprintf("%d", post.Rank))
+		postCount = negativeNumStyle.Render(fmt.Sprintf("%d", post.Rank+post.RankDelta))
 	}
 
 	fn := itemStyle.Render
@@ -50,21 +50,22 @@ func (d postDelegate) Render(w io.Writer, m list.Model, index int, listItem list
 		fn = selectedItemStyle.Render
 	}
 
-	fmt.Fprintln(w, fmt.Sprintf("   ▲ %s ▼ %s \n", postCount, fn(post.Username + " - " + post.Title)))
+	fmt.Fprintln(w, fmt.Sprintf("   ▲ %s ▼ %s \n", postCount, fn(post.Username+" - "+post.Title)))
 
 }
 
 // Just a generic tea.Model to demo terminal information of ssh.
 type model struct {
-	list       list.Model
-	input      textinput.Model
-	inputStyle lipgloss.Style
-	OnNew      func(Post)
-	OnUpdate   func(Post)
-	OnDelete   func(Post)
-	Refresh    func() []Post
-	width      int
-	height     int
+	currentUsername string
+	list            list.Model
+	input           textinput.Model
+	inputStyle      lipgloss.Style
+	OnNew           func(Post)
+	OnUpdate        func(Post)
+	OnDelete        func(Post)
+	Refresh         func() []Post
+	width           int
+	height          int
 }
 
 func (m model) Init() tea.Cmd {
@@ -83,7 +84,17 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch msg.String() {
 		case "+", "=":
+			post := m.list.SelectedItem().(Post)
+			if post.RankDelta == 0 || post.RankDelta == -1 {
+				post.RankDelta += 1
+			}
+			m.list.SetItem(m.list.Index(), post)
 		case "-", "_":
+			post := m.list.SelectedItem().(Post)
+			if post.RankDelta == 1 || post.RankDelta == 0 {
+				post.RankDelta -= 1
+			}
+			m.list.SetItem(m.list.Index(), post)
 		case "q", "ctrl+c":
 			return m, tea.Quit
 		}

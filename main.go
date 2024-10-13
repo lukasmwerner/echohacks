@@ -82,7 +82,7 @@ func teaHandler(s ssh.Session) (tea.Model, []tea.ProgramOption) {
 	})
 
 	l := list.New(listItems, postDelegate{}, 20, 12)
-	l.Title = "echohacks"
+	l.Title = "echohacks: @" + s.User()
 	//inputStyle := lipgloss.NewStyle().
 	//	Border(lipgloss.RoundedBorder()).
 	//	BorderForeground(lipgloss.Color("#874BFD")).
@@ -98,9 +98,10 @@ func teaHandler(s ssh.Session) (tea.Model, []tea.ProgramOption) {
 	//input.Width = 40
 
 	m := model{
-		width:  pty.Window.Width,
-		height: pty.Window.Height,
-		list:   l,
+		currentUsername: s.User(),
+		width:           pty.Window.Width,
+		height:          pty.Window.Height,
+		list:            l,
 	}
 	return m, []tea.ProgramOption{tea.WithAltScreen()}
 }
