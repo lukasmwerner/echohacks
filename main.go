@@ -9,6 +9,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/charmbracelet/bubbles/list"
 	tea "github.com/charmbracelet/bubbletea"
 	"github.com/charmbracelet/log"
 	"github.com/charmbracelet/ssh"
@@ -64,26 +65,42 @@ func teaHandler(s ssh.Session) (tea.Model, []tea.ProgramOption) {
 	// This should never fail, as we are using the activeterm middleware.
 	pty, _, _ := s.Pty()
 
+	listItems := []list.Item{}
+
+	listItems = append(listItems, Post{
+		Title:     "blasterhacks in rust btw",
+		Rank:      0,
+		RankDelta: 0,
+		Username:  "dogwater",
+	})
+
+	listItems = append(listItems, Post{
+		Title:     "wargames but in pascal",
+		Rank:      0,
+		RankDelta: 0,
+		Username:  "redhot",
+	})
+
+	l := list.New(listItems, postDelegate{}, 20, 12)
+	l.Title = "echohacks"
+	//inputStyle := lipgloss.NewStyle().
+	//	Border(lipgloss.RoundedBorder()).
+	//	BorderForeground(lipgloss.Color("#874BFD")).
+	//	Padding(1).
+	//	BorderTop(true).
+	//	BorderLeft(true).
+	//	BorderRight(true).
+	//	BorderBottom(true)
+
+	//input := textinput.New()
+	//input.Placeholder = "New Hackathon Idea"
+	//input.Prompt = ""
+	//input.Width = 40
+
 	m := model{
-		width:     pty.Window.Width,
-		height:    pty.Window.Height,
-		posts: []Post{
-			{
-				Title:    "BlasterHacks but in Go",
-				Rank:     0,
-				Username: "Tyler",
-			},
-			{
-				Title:    "Dubhacks but in Go",
-				Rank:     0,
-				Username: "Danial",
-			},
-			{
-				Title:    "HackKU but in Go",
-				Rank:     0,
-				Username: "Byron",
-			},
-		},
+		width:  pty.Window.Width,
+		height: pty.Window.Height,
+		list:   l,
 	}
 	return m, []tea.ProgramOption{tea.WithAltScreen()}
 }
