@@ -12,11 +12,17 @@ var (
 	negativeNumStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("#FF0000"))
 )
 
+type Post struct {
+	Title    string
+	Rank     int
+	Username string
+}
+
 // Just a generic tea.Model to demo terminal information of ssh.
 type model struct {
-	height    int
-	width     int
-	postcount int
+	height int
+	width  int
+	posts  []Post
 }
 
 func (m model) Init() tea.Cmd {

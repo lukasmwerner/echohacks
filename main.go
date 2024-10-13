@@ -67,7 +67,13 @@ func teaHandler(s ssh.Session) (tea.Model, []tea.ProgramOption) {
 	m := model{
 		width:     pty.Window.Width,
 		height:    pty.Window.Height,
-		postcount: 0,
+		posts: []Post{
+			{
+				Title:    "",
+				Rank:     0,
+				Username: "",
+			},
+		}
 	}
 	return m, []tea.ProgramOption{tea.WithAltScreen()}
 }
