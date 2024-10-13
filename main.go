@@ -25,7 +25,7 @@ import (
 )
 
 const (
-	host = "localhost"
+	host = "0.0.0.0"
 	port = "23234"
 )
 
@@ -92,8 +92,8 @@ func SqliteBubbleHandler(db *sql.DB) func(s ssh.Session) (tea.Model, []tea.Progr
 		for rows.Next() {
 			i += 1
 			var p Post
-			if i >=	20 {
-				break;
+			if i >= 20 {
+				break
 			}
 			if err := rows.Scan(&p.Title, &p.Rank, &p.Username); err != nil {
 				return nil, nil
