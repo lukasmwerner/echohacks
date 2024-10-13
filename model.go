@@ -43,7 +43,7 @@ func (d postDelegate) Render(w io.Writer, m list.Model, index int, listItem list
 		postCount = positiveNumStyle.Render(fmt.Sprintf("%d", post.Rank+post.RankDelta))
 	} else if post.Rank+post.RankDelta < 0 {
 		postCount = negativeNumStyle.Render(fmt.Sprintf("%d", post.Rank+post.RankDelta))
-	} else{
+	} else {
 		postCount = neutralNumStyle.Render(fmt.Sprintf("%d", post.Rank+post.RankDelta))
 	}
 	fn := itemStyle.Render
@@ -63,7 +63,6 @@ type model struct {
 	inputStyle      lipgloss.Style
 	OnNew           func(Post)
 	OnUpdate        func(Post)
-	OnDelete        func(Post)
 	Refresh         func() []Post
 	width           int
 	height          int
@@ -83,21 +82,55 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		m.list.SetWidth(msg.Width)
 		m.list.SetHeight(msg.Height - 8)
 	case tea.KeyMsg:
-		switch msg.String() {
-		case "+", "=":
-			post := m.list.SelectedItem().(Post)
-			if post.RankDelta == 0 || post.RankDelta == -1 {
-				post.RankDelta += 1
+		if m.input.Focused() {
+			switch msg.String() {
+			case "esc":
+				m.input.Blur()
+			case "enter":
+				post := Post{
+					Title:     m.input.Value(),
+					Rank:      0,
+					RankDelta: 0,
+					Username:  m.currentUsername,
+				}
+				m.input.SetValue("")
+				m.input.Blur()
+				cmd = m.list.InsertItem(len(m.list.Items()), post)
+				cmds = append(cmds, cmd)
+				if m.OnNew != nil {
+					m.OnNew(post)
+				}
+			default:
+				m.input, cmd = m.input.Update(msg)
+				cmds = append(cmds, cmd)
 			}
-			m.list.SetItem(m.list.Index(), post)
-		case "-", "_":
-			post := m.list.SelectedItem().(Post)
-			if post.RankDelta == 1 || post.RankDelta == 0 {
-				post.RankDelta -= 1
+		} else {
+			switch msg.String() {
+			case "n":
+				m.input.Focus()
+				cmds = append(cmds, textinput.Blink)
+			case "+", "=":
+				post := m.list.SelectedItem().(Post)
+				if post.RankDelta == 0 || post.RankDelta == -1 {
+					post.RankDelta += 1
+				}
+				m.list.SetItem(m.list.Index(), post)
+				if m.OnUpdate != nil {
+					m.OnUpdate(post)
+				}
+			case "-", "_":
+				post := m.list.SelectedItem().(Post)
+				if post.RankDelta == 1 || post.RankDelta == 0 {
+					post.RankDelta -= 1
+				}
+				m.list.SetItem(m.list.Index(), post)
+				if m.OnUpdate != nil {
+					m.OnUpdate(post)
+				}
+
+			case "q", "ctrl+c":
+				return m, tea.Quit
 			}
-			m.list.SetItem(m.list.Index(), post)
-		case "q", "ctrl+c":
-			return m, tea.Quit
 		}
 	}
 
@@ -109,6 +142,13 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m model) View() string {
+
+	if m.input.Focused() {
+		return lipgloss.Place(m.width, m.height, lipgloss.Center, lipgloss.Center,
+			m.inputStyle.Render(m.input.View()),
+		)
+	}
+
 	list := m.list.View()
 	return list
 }
