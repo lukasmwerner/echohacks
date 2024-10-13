@@ -12,7 +12,7 @@ import (
 
 var (
 	itemStyle         = lipgloss.NewStyle()
-	selectedItemStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("170"))
+	selectedItemStyle = lipgloss.NewStyle().Foreground(lipgloss.Color("#5F5FDF")).Bold(true)
 	positiveNumStyle  = lipgloss.NewStyle().Foreground(lipgloss.Color("#00FF00"))
 	negativeNumStyle  = lipgloss.NewStyle().Foreground(lipgloss.Color("#FF0000"))
 )
@@ -50,7 +50,7 @@ func (d postDelegate) Render(w io.Writer, m list.Model, index int, listItem list
 		fn = selectedItemStyle.Render
 	}
 
-	fmt.Fprintln(w, fn(fmt.Sprintf("▲ %s ▼ %s - %s\n", postCount, post.Username, post.Title)))
+	fmt.Fprintln(w, fmt.Sprintf("▲ %s ▼ %s \n", postCount, fn(post.Username + " - " + post.Title)))
 
 }
 
