@@ -12,6 +12,7 @@ import (
 
 	_ "modernc.org/sqlite"
 
+	"github.com/charmbracelet/bubbles/help"
 	"github.com/charmbracelet/bubbles/list"
 	"github.com/charmbracelet/bubbles/textinput"
 	tea "github.com/charmbracelet/bubbletea"
@@ -127,6 +128,7 @@ func SqliteBubbleHandler(db *sql.DB) func(s ssh.Session) (tea.Model, []tea.Progr
 
 		l := list.New(listItems, postDelegate{}, 20, 12)
 		l.Title = "echohacks: @" + s.User()
+		l.SetShowHelp(false)
 
 		inputStyle := lipgloss.NewStyle().
 			Border(lipgloss.RoundedBorder()).
@@ -142,6 +144,9 @@ func SqliteBubbleHandler(db *sql.DB) func(s ssh.Session) (tea.Model, []tea.Progr
 		input.Prompt = ""
 		input.Width = 40
 
+		h := help.New()
+		h.Styles = l.Help.Styles
+
 		m := model{
 			currentUsername: s.User(),
 			width:           pty.Window.Width,
@@ -149,6 +154,7 @@ func SqliteBubbleHandler(db *sql.DB) func(s ssh.Session) (tea.Model, []tea.Progr
 			list:            l,
 			input:           input,
 			inputStyle:      inputStyle,
+			help:            h,
 		}
 
 		m.OnNew = func(p Post) {
