@@ -22,18 +22,35 @@ import (
 	"github.com/charmbracelet/wish/activeterm"
 	"github.com/charmbracelet/wish/bubbletea"
 	"github.com/charmbracelet/wish/logging"
+	"github.com/muesli/termenv"
 )
 
 const (
 	host = "0.0.0.0"
-	port = "23234"
 )
 
 func main() {
+	lipgloss.SetColorProfile(termenv.TrueColor) // fix for fly.io deployments
+	port, ok := os.LookupEnv("PORT")
+	if !ok {
+		port = "23234"
+	}
 
-	db, err := sql.Open("sqlite", "./app.db")
+	db, err := sql.Open("sqlite", "./.ssh/app.db")
 	if err != nil {
 		log.Error("Unable to read sqlite database", "error", err)
+	}
+
+	_, err = db.Exec(`
+			CREATE TABLE IF NOT EXISTS posts (
+				title TEXT,
+				rank INTEGER,
+				username TEXT,
+				PRIMARY KEY (title, username)
+			)
+		`)
+	if err != nil {
+		log.Error("Unable to ensure sqlite database schema", "error", err)
 	}
 
 	s, err := wish.NewServer(
@@ -88,15 +105,13 @@ func SqliteBubbleHandler(db *sql.DB) func(s ssh.Session) (tea.Model, []tea.Progr
 			return nil, nil
 		}
 		defer rows.Close()
-		i := 0
 		for rows.Next() {
-			i += 1
 			var p Post
-			if i >= 20 {
-				break
-			}
 			if err := rows.Scan(&p.Title, &p.Rank, &p.Username); err != nil {
 				return nil, nil
+			}
+			if p.Rank <= -10 {
+				continue
 			}
 			listItems = append(listItems, Post{
 				Title:     p.Title,
@@ -112,7 +127,6 @@ func SqliteBubbleHandler(db *sql.DB) func(s ssh.Session) (tea.Model, []tea.Progr
 
 		l := list.New(listItems, postDelegate{}, 20, 12)
 		l.Title = "echohacks: @" + s.User()
-		l.SetShowHelp(false)
 
 		inputStyle := lipgloss.NewStyle().
 			Border(lipgloss.RoundedBorder()).
