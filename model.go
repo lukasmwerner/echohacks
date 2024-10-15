@@ -169,6 +169,9 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			keys.Help.SetEnabled(true)
 
 		case key.Matches(msg, key.NewBinding(key.WithKeys("enter"))) && m.input.Focused():
+			if m.input.Value() == "" {
+				break
+			}
 			post := Post{
 				Title:     m.input.Value(),
 				Rank:      0,
@@ -198,7 +201,6 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (m model) View() string {
-
 	if m.input.Focused() {
 		return lipgloss.Place(m.width, m.height, lipgloss.Center, lipgloss.Center,
 			m.inputStyle.Render(m.input.View()),
